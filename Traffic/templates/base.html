@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Traffic Congestion Predictor{% endblock %}</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- jsPDF for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <!-- Heroicons -->
+    <script src="https://unpkg.com/@heroicons/react@2.0.18/24/outline/esm/index.js"></script>
+
+    <!-- Custom styles -->
+    <style>
+        .gradient-bg {
+            background: black;
+        }
+
+        .bg-lavender {
+            background-color: #E6E6FA;
+        }
+
+        .glass-effect {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.1);
+        }
+    </style>
+
+    {% block extra_head %}{% endblock %}
+</head>
+
+<body class="bg-white min-h-screen flex flex-col">
+    <!-- Navigation -->
+    <nav class="bg-black border-b border-black">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="{% url 'home' %}" class="flex items-center space-x-2">
+                        <span class="text-xl font-bold text-white">Traffic Predictor</span>
+                    </a>
+                </div>
+
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="{% url 'home' %}"
+                        class="text-white hover:text-gray-300 px-3 py-2 text-sm font-medium">Home</a>
+                    <a href="{% url 'predict' %}"
+                        class="text-white hover:text-gray-300 px-3 py-2 text-sm font-medium">Predict</a>
+                    <a href="{% url 'news' %}"
+                        class="text-white hover:text-gray-300 px-3 py-2 text-sm font-medium">News</a>
+                    <a href="{% url 'dashboard' %}"
+                        class="text-white hover:text-gray-300 px-3 py-2 text-sm font-medium">Dashboard</a>
+                    <a href="{% url 'about' %}"
+                        class="text-white hover:text-gray-300 px-3 py-2 text-sm font-medium">About</a>
+                </div>
+
+                <div class="flex items-center space-x-4">
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile menu -->
+        <div class="md:hidden">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="{% url 'home' %}"
+                    class="text-white hover:text-gray-300 block px-3 py-2 text-base font-medium">Home</a>
+                <a href="{% url 'predict' %}"
+                    class="text-white hover:text-gray-300 block px-3 py-2 text-base font-medium">Predict</a>
+                <a href="{% url 'news' %}"
+                    class="text-white hover:text-gray-300 block px-3 py-2 text-base font-medium">News</a>
+                <a href="{% url 'dashboard' %}"
+                    class="text-white hover:text-gray-300 block px-3 py-2 text-base font-medium">Dashboard</a>
+                <a href="{% url 'about' %}"
+                    class="text-white hover:text-gray-300 block px-3 py-2 text-base font-medium">About</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Messages -->
+    {% if messages %}
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+        {% for message in messages %}
+        <div class="mb-4 p-4 bg-black text-white">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main class="flex-1">
+        {% block content %}{% endblock %}
+    </main>
+
+
+    {% block extra_scripts %}{% endblock %}
+</body>
+
+</html>

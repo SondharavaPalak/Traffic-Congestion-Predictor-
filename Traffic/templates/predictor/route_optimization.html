@@ -1,0 +1,252 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Route Optimization - Traffic Predictor{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="h3 text-primary">🛣️ Route Optimization & Comparison</h1>
+            <p class="text-muted">Find the best route based on cost, time, or comfort</p>
+        </div>
+    </div>
+
+    <form id="routeForm" class="row mb-4">
+        <div class="col-md-3">
+            <label class="form-label">City</label>
+            <select class="form-select" id="city" required>
+                <option value="">Select city</option>
+                <option value="Delhi">Delhi</option>
+                <option value="Mumbai">Mumbai</option>
+                <option value="Bengaluru">Bengaluru</option>
+                <option value="Hyderabad">Hyderabad</option>
+                <option value="Chennai">Chennai</option>
+                <option value="Kolkata">Kolkata</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">From</label>
+            <input type="text" class="form-control" id="source" placeholder="Source location" required>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">To</label>
+            <input type="text" class="form-control" id="destination" placeholder="Destination" required>
+        </div>
+        <div class="col-md-3 d-flex align-items-end">
+            <button type="button" class="btn btn-primary w-100" onclick="optimizeRoute()">
+                🔍 Find Routes
+            </button>
+        </div>
+    </form>
+
+    <!-- Results Section -->
+    <div id="resultsContainer" style="display: none;">
+        <!-- Route Cards -->
+        <div class="row mb-4" id="routesContainer"></div>
+
+        <!-- Cost Comparison Table -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-light">
+                        <h6 class="mb-0">💰 Cost Comparison by Transport Mode</h6>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table mb-0" id="costComparisonTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Mode</th>
+                                    <th>Rank</th>
+                                    <th>Fuel Cost</th>
+                                    <th>Toll Cost</th>
+                                    <th>Parking</th>
+                                    <th>Total Cost</th>
+                                    <th>Cost/km</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recommendations -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card bg-light">
+                    <div class="card-header">
+                        <h6 class="mb-0">✨ Smart Recommendations</h6>
+                    </div>
+                    <div class="card-body" id="recommendationsContainer"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div id="loadingSpinner" style="display: none; text-align: center; padding: 40px;">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-3">Analyzing routes...</p>
+    </div>
+
+    <!-- Info Cards -->
+    <div class="row mt-5">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">⚡ Fastest Route</h6>
+                    <p class="small text-muted">Direct path with minimal turns, ideal for time-sensitive trips</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">💰 Cheapest Route</h6>
+                    <p class="small text-muted">Optimized for cost savings, may take slightly longer</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">🌳 Comfortable Route</h6>
+                    <p class="small text-muted">Avoids heavy traffic, prioritizes smooth ride</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+async function optimizeRoute() {
+    const city = document.getElementById('city').value;
+    const source = document.getElementById('source').value;
+    const destination = document.getElementById('destination').value;
+
+    if (!city || !source || !destination) {
+        alert('Please fill in all fields');
+        return;
+    }
+
+    // Show loading
+    document.getElementById('loadingSpinner').style.display = 'block';
+    document.getElementById('resultsContainer').style.display = 'none';
+
+    try {
+        const response = await fetch('{% url "route_optimization" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || ''
+            },
+            body: JSON.stringify({
+                city: city,
+                source: source,
+                destination: destination,
+                source_lat: 28.7041,  // Placeholder (in real app, would geocode)
+                source_lon: 77.1025,
+                dest_lat: 28.5355,
+                dest_lon: 77.3910,
+                distance_km: 12.5,
+                route_type: 'local',
+                duration_mins: 30
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            displayRoutes(data.routes);
+            displayCostComparison(data.cost_comparison, data.distance_km);
+            displayRecommendations(data.routes, data.cost_comparison);
+            
+            document.getElementById('resultsContainer').style.display = 'block';
+        }
+    } catch (error) {
+        alert('Error optimizing routes: ' + error.message);
+        console.error(error);
+    } finally {
+        document.getElementById('loadingSpinner').style.display = 'none';
+    }
+}
+
+function displayRoutes(routes) {
+    const container = document.getElementById('routesContainer');
+    container.innerHTML = '';
+
+    routes.forEach((route, index) => {
+        const card = document.createElement('div');
+        card.className = 'col-md-6 col-lg-4 mb-3';
+        card.innerHTML = `
+            <div class="card h-100 ${index === 0 ? 'border-success' : ''}">
+                <div class="card-body">
+                    <h6 class="card-title">${route.name}</h6>
+                    <div class="mb-3">
+                        <span class="badge bg-primary">${route.distance_km} km</span>
+                        <span class="badge bg-info">${route.estimated_duration} mins</span>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Flexibility:</strong> ${route.flexibility}<br>
+                        <strong>Traffic Risk:</strong> ${route.congestion_risk}
+                    </div>
+                    <small class="text-muted">Route Type: ${route.route_type}</small>
+                    ${index === 0 ? '<hr><span class="badge bg-success">RECOMMENDED</span>' : ''}
+                </div>
+            </div>
+        `;
+        container.appendChild(card);
+    });
+}
+
+function displayCostComparison(costs, distance) {
+    const tbody = document.querySelector('#costComparisonTable tbody');
+    tbody.innerHTML = '';
+
+    Object.entries(costs).forEach(([mode, data], index) => {
+        const row = document.createElement('tr');
+        row.className = index === 0 ? 'table-success' : '';
+        row.innerHTML = `
+            <td><strong>${data.mode}</strong></td>
+            <td>${data.rank}</td>
+            <td>₹${data.fuel_cost || 0}</td>
+            <td>₹${data.toll_cost || 0}</td>
+            <td>₹${data.parking_cost || 0}</td>
+            <td><strong>₹${data.total_cost}</strong></td>
+            <td>₹${data.cost_per_km || 0}/km</td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+function displayRecommendations(routes, costs) {
+    const container = document.getElementById('recommendationsContainer');
+    const bestRoute = routes[0];
+    const cheapestMode = Object.entries(costs).reduce((a, b) => 
+        a[1].total_cost < b[1].total_cost ? a : b
+    );
+
+    container.innerHTML = `
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <strong>📍 Best Route:</strong><br>
+                <span class="badge bg-success">${bestRoute.name}</span>
+                <p class="small mt-2">${bestRoute.distance_km} km, ~${bestRoute.estimated_duration} minutes</p>
+            </div>
+            <div class="col-md-6 mb-3">
+                <strong>💰 Most Economical:</strong><br>
+                <span class="badge bg-info">${cheapestMode[0]}</span>
+                <p class="small mt-2">₹${cheapestMode[1].total_cost}</p>
+            </div>
+        </div>
+        <hr>
+        <p class="small text-muted">💡 <strong>Tip:</strong> Times and costs are estimates. Actual values may vary based on real-time traffic and current fuel prices.</p>
+    `;
+}
+</script>
+{% endblock %}

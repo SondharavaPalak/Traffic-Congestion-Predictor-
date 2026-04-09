@@ -1,0 +1,194 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}User Profile - Traffic Predictor{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="h3 text-primary">⚙️ My Profile & Preferences</h1>
+            <p class="text-muted">Customize your traffic prediction experience</p>
+        </div>
+    </div>
+
+    {% if messages %}
+    <div class="row mb-3">
+        {% for message in messages %}
+        <div class="col-12">
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <form method="POST" class="row">
+        {% csrf_token %}
+
+        <!-- Personal Information -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0">👤 Personal Information</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Username</label>
+                        <input type="text" class="form-control" value="{{ user.username }}" disabled>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" value="{{ user.email }}" disabled>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Primary City</label>
+                        <select class="form-select" name="primary_city">
+                            <option value="">Select a city</option>
+                            {% for city in cities %}
+                            <option value="{{ city }}" {% if user_profile.primary_city == city %}selected{% endif %}>{{ city }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Transport Preferences -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0">🚗 Transport Preferences</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Preferred Mode</label>
+                        <select class="form-select" name="preferred_mode">
+                            {% for mode in modes %}
+                            <option value="{{ mode }}" {% if user_profile.preferred_mode == mode %}selected{% endif %}>{{ mode }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Commute Time Preference</label>
+                        <select class="form-select" name="commute_time_preference">
+                            <option value="Fast" {% if user_profile.commute_time_preference == 'Fast' %}selected{% endif %}>⚡ Fastest</option>
+                            <option value="Balanced" {% if user_profile.commute_time_preference == 'Balanced' %}selected{% endif %}>⚖️ Balanced (Cost vs Time)</option>
+                            <option value="Cheap" {% if user_profile.commute_time_preference == 'Cheap' %}selected{% endif %}>💰 Cheapest</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Car Details -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0">🚙 Car Details</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Car Make/Model</label>
+                        <input type="text" class="form-control" name="car_make" value="{{ user_profile.car_make }}" placeholder="e.g., Hyundai i20, Toyota Fortuner">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Mileage (km/liter)</label>
+                        <input type="number" class="form-control" name="car_mileage_kmpl" value="{{ user_profile.car_mileage_kmpl }}" step="0.1" min="1">
+                        <small class="text-muted">Affects fuel cost calculation</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Fuel Cost per Liter (₹)</label>
+                        <input type="number" class="form-control" name="fuel_cost_per_liter" value="{{ user_profile.fuel_cost_per_liter }}" step="0.50" min="0">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notification Settings -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0">🔔 Notification Settings</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" name="enable_notifications" 
+                               id="enableNotif" {% if user_profile.enable_notifications %}checked{% endif %} value="on">
+                        <label class="form-check-label" for="enableNotif">
+                            Enable Notifications
+                        </label>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Notify me when traffic is:</label>
+                        <select class="form-select" name="notification_threshold">
+                            <option value="Low" {% if user_profile.notification_threshold == 'Low' %}selected{% endif %}>🟢 Low (Always)</option>
+                            <option value="Medium" {% if user_profile.notification_threshold == 'Medium' %}selected{% endif %}>🟡 Medium (Moderate or worse)</option>
+                            <option value="High" {% if user_profile.notification_threshold == 'High' %}selected{% endif %}>🔴 High (Severe only)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bike Details -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0">🚲 Bike Details</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Bike Mileage (km/liter)</label>
+                        <input type="number" class="form-control" name="bike_mileage_kmpl" value="{{ user_profile.bike_mileage_kmpl }}" step="0.1" min="1">
+                        <small class="text-muted">For cost calculation</small>
+                    </div>
+                    <div class="alert alert-info" role="alert">
+                        <small>Bike rental cost is calculated separately based on distance and duration.</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary & Actions -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0">📊 Your Profile Summary</h6>
+                </div>
+                <div class="card-body small">
+                    <p><strong>Member Since:</strong> {{ user_profile.created_at|date:"d M Y" }}</p>
+                    <p><strong>Last Updated:</strong> {{ user_profile.updated_at|date:"d M Y, H:i" }}</p>
+                    <p><strong>Preferred Mode:</strong> {{ user_profile.preferred_mode }}</p>
+                    <p><strong>Primary City:</strong> {{ user_profile.primary_city|default:"Not set" }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Save Button -->
+        <div class="col-12 mb-4">
+            <button type="submit" class="btn btn-primary btn-lg">💾 Save Changes</button>
+            <a href="{% url 'analytics_dashboard' %}" class="btn btn-secondary btn-lg">Cancel</a>
+        </div>
+    </form>
+
+    <!-- Info Card -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h6 class="card-title">💡 How These Settings Help</h6>
+                    <ul class="mb-0">
+                        <li><strong>Transport Preferences:</strong> Help us suggest the best route for you</li>
+                        <li><strong>Car Details:</strong> Used to calculate accurate fuel costs</li>
+                        <li><strong>Time Preference:</strong> Optimizes route selection (fast vs cheap)</li>
+                        <li><strong>Notifications:</strong> Alert you when traffic affects your regular routes</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

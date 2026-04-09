@@ -1,0 +1,432 @@
+{% extends 'base.html' %}
+
+{% block title %}Predict Traffic - Traffic Congestion Predictor{% endblock %}
+
+{% block extra_head %}
+<!-- Folium CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<!-- Folium JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="text-center mb-8">
+        <h1 class="text-3xl md:text-4xl font-bold text-black mb-4">
+            Traffic Congestion Predictor
+        </h1>
+        <p class="text-xl text-black">
+            Enter your journey details to get accurate traffic predictions
+        </p>
+    </div>
+
+    <div class="grid lg:grid-cols-2 gap-8">
+        <!-- Input Card -->
+        <div class="bg-lavender p-8">
+            <h2 class="text-2xl font-bold text-black mb-6">Journey Details</h2>
+
+            <form method="post" id="predictForm">
+                {% csrf_token %}
+                <div class="space-y-6">
+                    <!-- City Selection -->
+                    <div>
+                        <label for="city" class="block text-sm font-medium text-black mb-2">City</label>
+                        <select name="city" id="city" required
+                            class="w-full px-4 py-3 border border-black focus:ring-2 focus:ring-black focus:border-transparent">
+                            <option value="">Select a city</option>
+                            {% for city in cities %}
+                            <option value="{{ city }}">{{ city }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Source -->
+                    <div class="relative">
+                        <label for="source" class="block text-sm font-medium text-black mb-2">Source</label>
+                        <input type="text" name="source" id="source" required
+                            placeholder="Enter source location (e.g., Connaught Place, Delhi)"
+                            class="w-full px-4 py-3 border border-black focus:ring-2 focus:ring-black focus:border-transparent"
+                            autocomplete="off">
+                        <div id="source-suggestions" class="absolute z-10 w-full bg-white border border-black mt-1 max-h-60 overflow-y-auto hidden"></div>
+                    </div>
+
+                    <!-- Destination -->
+                    <div class="relative">
+                        <label for="destination"
+                            class="block text-sm font-medium text-black mb-2">Destination</label>
+                        <input type="text" name="destination" id="destination" required
+                            placeholder="Enter destination location (e.g., Aerocity, Delhi)"
+                            class="w-full px-4 py-3 border border-black focus:ring-2 focus:ring-black focus:border-transparent"
+                            autocomplete="off">
+                        <div id="destination-suggestions" class="absolute z-10 w-full bg-white border border-black mt-1 max-h-60 overflow-y-auto hidden"></div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit"
+                        class="w-full bg-black hover:bg-gray-800 text-white font-bold py-3 px-6 transition duration-300">
+                        Predict Traffic
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Results Card -->
+        {% if show_result %}
+        <div class="bg-lavender p-8">
+            <h2 class="text-2xl font-bold text-black mb-6">Prediction Results</h2>
+
+            <!-- Congestion Level Badge -->
+            <div class="mb-6">
+                <div class="text-sm text-black mb-2">Congestion Level</div>
+                <div class="inline-flex items-center px-4 py-2 text-lg font-bold bg-black text-white">
+                    {{ prediction.congestion_level }} Congestion
+                </div>
+            </div>
+
+            <!-- Suggested Mode -->
+            <div class="mb-6">
+                <div class="text-sm text-black mb-2">Recommended Transport</div>
+                <div class="inline-flex items-center px-4 py-2 bg-black text-white font-medium">
+                    {{ prediction.suggested_mode }}
+                </div>
+            </div>
+
+            <!-- Journey Details -->
+            <div class="mb-6">
+                <div class="text-sm text-black mb-2">Journey Details</div>
+                <div class="bg-white p-4">
+                    <div class="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                            <span class="font-medium">Distance:</span> {{ prediction.distance_km|floatformat:1 }} km
+                        </div>
+                        <div>
+                            <span class="font-medium">Time:</span> {{ prediction.hour }}:00
+                        </div>
+                        <div>
+                            <span class="font-medium">Weather:</span> {{ prediction.weather }}
+                        </div>
+                        <div>
+                            <span class="font-medium">Day Type:</span> {{ prediction.day_type|title }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex space-x-4">
+                <button onclick="showMap()"
+                    class="flex-1 bg-black hover:bg-gray-800 text-white font-medium py-2 px-4 transition duration-300">
+                    View Map
+                </button>
+                <button onclick="downloadPDF()"
+                    class="flex-1 bg-black hover:bg-gray-800 text-white font-medium py-2 px-4 transition duration-300">
+                    Download PDF
+                </button>
+            </div>
+        </div>
+        {% else %}
+        <div class="bg-lavender p-8">
+            <div class="text-center text-black">
+                <p class="text-lg">Enter your journey details to see predictions</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if show_result %}
+    <!-- Charts and Maps Section -->
+    <div class="mt-12 space-y-8">
+        <!-- Hourly Trend Chart - Full Width -->
+        <div class="bg-lavender p-8">
+            <h3 class="text-xl font-bold text-black mb-6">Hourly Congestion Trend</h3>
+            <div style="height: 400px; width: 100%;">
+                <canvas id="trendChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Map Section -->
+        <div class="bg-lavender p-8">
+            <h3 class="text-xl font-bold text-black mb-6">Route Map</h3>
+            <div id="map" style="height: 400px; width: 100%;"></div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Map Modal -->
+<div id="mapModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white p-6 max-w-4xl w-full">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold">Route Map</h3>
+                <button onclick="closeMap()" class="text-black hover:text-gray-700">
+                    X
+                </button>
+            </div>
+            <div id="modalMap" style="height: 500px; width: 100%;"></div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+{% if show_result %}
+<script>
+    // Chart.js configurations
+    const ctx2 = document.getElementById('trendChart').getContext('2d');
+
+    // Trend Chart - Enhanced for full width
+    const trendChart = new Chart(ctx2, {
+        type: 'line',
+        data: {
+            labels: Array.from({ length: 24 }, (_, i) => i + ':00'),
+            datasets: [{
+                label: 'Congestion Level (%)',
+                data: Array.from({ length: 24 }, (_, i) => {
+                    if ((i >= 8 && i <= 10) || (i >= 17 && i <= 19)) return Math.random() * 30 + 70;
+                    if ((i >= 7 && i <= 11) || (i >= 16 && i <= 20)) return Math.random() * 20 + 50;
+                    return Math.random() * 30 + 20;
+                }),
+                borderColor: 'rgba(59, 130, 246, 1)',
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                tension: 0.4,
+                fill: true,
+                pointBackgroundColor: 'rgba(59, 130, 246, 1)',
+                pointBorderColor: '#ffffff',
+                pointBorderWidth: 2,
+                pointRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    title: {
+                        display: true,
+                        text: 'Congestion Level (%)'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Hour of Day'
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top'
+                }
+            }
+        }
+    });
+
+    // Map initialization
+    let map, modalMap;
+    const sourceLat = {{ prediction.source_lat }};
+    const sourceLon = {{ prediction.source_lon }};
+    const destLat = {{ prediction.dest_lat }};
+    const destLon = {{ prediction.dest_lon }};
+
+    function initMap() {
+        // Main map
+        map = L.map('map').setView([(sourceLat + destLat) / 2, (sourceLon + destLon) / 2], 12);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+        // Add markers
+        L.marker([sourceLat, sourceLon]).addTo(map)
+            .bindPopup('Source: {{ prediction.source|escapejs }}')
+            .openPopup();
+
+        L.marker([destLat, destLon]).addTo(map)
+            .bindPopup('Destination: {{ prediction.destination|escapejs }}');
+
+        // Add route line
+        L.polyline([[sourceLat, sourceLon], [destLat, destLon]], {
+            color: 'blue',
+            weight: 3,
+            opacity: 0.7
+        }).addTo(map);
+    }
+
+    function showMap() {
+        document.getElementById('mapModal').classList.remove('hidden');
+
+        // Initialize modal map
+        setTimeout(() => {
+            modalMap = L.map('modalMap').setView([(sourceLat + destLat) / 2, (sourceLon + destLon) / 2], 12);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(modalMap);
+
+            L.marker([sourceLat, sourceLon]).addTo(modalMap)
+                .bindPopup('Source: {{ prediction.source|escapejs }}')
+                .openPopup();
+
+            L.marker([destLat, destLon]).addTo(modalMap)
+                .bindPopup('Destination: {{ prediction.destination|escapejs }}');
+
+            L.polyline([[sourceLat, sourceLon], [destLat, destLon]], {
+                color: 'blue',
+                weight: 3,
+                opacity: 0.7
+            }).addTo(modalMap);
+        }, 100);
+    }
+
+    function closeMap() {
+        document.getElementById('mapModal').classList.add('hidden');
+        if (modalMap) {
+            modalMap.remove();
+        }
+    }
+
+    function downloadPDF() {
+        // Create a simple PDF download using jsPDF
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        
+        doc.setFontSize(20);
+        doc.text('Traffic Prediction Report', 20, 30);
+        
+        doc.setFontSize(12);
+        doc.text('City: {{ prediction.city|escapejs }}', 20, 50);
+        doc.text('Source: {{ prediction.source|escapejs }}', 20, 60);
+        doc.text('Destination: {{ prediction.destination|escapejs }}', 20, 70);
+        doc.text('Distance: {{ prediction.distance_km|floatformat:1 }} km', 20, 80);
+        doc.text('Congestion Level: {{ prediction.congestion_level|escapejs }}', 20, 90);
+        doc.text('Recommended Mode: {{ prediction.suggested_mode|escapejs }}', 20, 100);
+        doc.text('Weather: {{ prediction.weather|escapejs }}', 20, 110);
+        doc.text('Day Type: {{ prediction.day_type|title|escapejs }}', 20, 120);
+        
+        doc.save('traffic-prediction-report.pdf');
+    }
+
+    // Initialize map when page loads
+    document.addEventListener('DOMContentLoaded', function () {
+        initMap();
+    });
+</script>
+{% endif %}
+
+<script>
+// Location autocomplete functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const sourceInput = document.getElementById('source');
+    const destinationInput = document.getElementById('destination');
+    const citySelect = document.getElementById('city');
+    const sourceSuggestions = document.getElementById('source-suggestions');
+    const destinationSuggestions = document.getElementById('destination-suggestions');
+
+    // Popular locations for each city
+    const cityLocations = {
+        'Delhi': [
+            'Connaught Place', 'India Gate', 'Red Fort', 'Qutub Minar', 'Lotus Temple',
+            'Akshardham Temple', 'Chandni Chowk', 'Karol Bagh', 'Lajpat Nagar',
+            'Saket', 'Vasant Kunj', 'Dwarka', 'Rohini', 'Pitampura', 'Janakpuri',
+            'Rajouri Garden', 'Tilak Nagar', 'Laxmi Nagar', 'Preet Vihar', 'Mayur Vihar',
+            'Noida Sector 18', 'Gurgaon Cyber City', 'Aerocity', 'IGI Airport',
+            'New Delhi Railway Station', 'Old Delhi Railway Station', 'ISBT Kashmere Gate'
+        ],
+        'Mumbai': [
+            'Gateway of India', 'Marine Drive', 'Juhu Beach', 'Bandra-Kurla Complex',
+            'Andheri', 'Powai', 'Thane', 'Navi Mumbai', 'Colaba', 'Fort',
+            'Churchgate', 'CST Station', 'Dadar', 'King Circle', 'Sion',
+            'Kurla', 'Ghatkopar', 'Mulund', 'Borivali', 'Malad', 'Goregaon',
+            'Jogeshwari', 'Vile Parle', 'Santa Cruz', 'Khar', 'Bandra'
+        ],
+        'Bengaluru': [
+            'MG Road', 'Brigade Road', 'Commercial Street', 'Koramangala',
+            'Indiranagar', 'Whitefield', 'Electronic City', 'Silk Board',
+            'Marathahalli', 'Bellandur', 'HSR Layout', 'BTM Layout',
+            'Jayanagar', 'Basavanagudi', 'Malleshwaram', 'Rajajinagar',
+            'Yeshwantpur', 'Hebbal', 'Airport Road', 'Sarjapur Road'
+        ],
+        'Hyderabad': [
+            'Charminar', 'Hussain Sagar', 'Banjara Hills', 'Jubilee Hills',
+            'HITEC City', 'Gachibowli', 'Kondapur', 'Madhapur', 'Kukatpally',
+            'Secunderabad', 'Begumpet', 'Ameerpet', 'Somajiguda', 'Abids',
+            'Koti', 'Dilsukhnagar', 'LB Nagar', 'Uppal', 'Kompally'
+        ],
+        'Chennai': [
+            'Marina Beach', 'T. Nagar', 'Anna Nagar', 'Adyar', 'Velachery',
+            'OMR', 'ECR', 'Porur', 'Tambaram', 'Chrompet', 'Guindy',
+            'Nungambakkam', 'Egmore', 'Central Station', 'Airport',
+            'Sholinganallur', 'Perungudi', 'Thoraipakkam', 'Besant Nagar'
+        ],
+        'Kolkata': [
+            'Victoria Memorial', 'Howrah Bridge', 'Park Street', 'New Market',
+            'Esplanade', 'Sealdah', 'Howrah Station', 'Salt Lake', 'New Town',
+            'Rajarhat', 'Ballygunge', 'Gariahat', 'Rashbehari', 'Jadavpur',
+            'Tollygunge', 'Behala', 'Garia', 'Barasat', 'Dum Dum'
+        ]
+    };
+
+    function showSuggestions(input, suggestionsDiv, query) {
+        const selectedCity = citySelect.value;
+        if (!selectedCity || query.length < 2) {
+            suggestionsDiv.classList.add('hidden');
+            return;
+        }
+
+        const locations = cityLocations[selectedCity] || [];
+        const filteredLocations = locations.filter(location => 
+            location.toLowerCase().includes(query.toLowerCase())
+        );
+
+        if (filteredLocations.length === 0) {
+            suggestionsDiv.classList.add('hidden');
+            return;
+        }
+
+        suggestionsDiv.innerHTML = filteredLocations.map(location => 
+            `<div class="px-4 py-2 hover:bg-gray-100 cursor-pointer border-b border-black last:border-b-0" 
+                 onclick="selectLocation('${input.id}', '${location}')">${location}, ${selectedCity}</div>`
+        ).join('');
+
+        suggestionsDiv.classList.remove('hidden');
+    }
+
+    function selectLocation(inputId, location) {
+        const input = document.getElementById(inputId);
+        const selectedCity = citySelect.value;
+        input.value = `${location}, ${selectedCity}`;
+        
+        const suggestionsDiv = document.getElementById(`${inputId}-suggestions`);
+        suggestionsDiv.classList.add('hidden');
+    }
+
+    // Make selectLocation globally available
+    window.selectLocation = selectLocation;
+
+    // Add event listeners
+    sourceInput.addEventListener('input', function() {
+        showSuggestions(sourceInput, sourceSuggestions, this.value);
+    });
+
+    destinationInput.addEventListener('input', function() {
+        showSuggestions(destinationInput, destinationSuggestions, this.value);
+    });
+
+    // Hide suggestions when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!sourceInput.contains(e.target) && !sourceSuggestions.contains(e.target)) {
+            sourceSuggestions.classList.add('hidden');
+        }
+        if (!destinationInput.contains(e.target) && !destinationSuggestions.contains(e.target)) {
+            destinationSuggestions.classList.add('hidden');
+        }
+    });
+
+    // Clear suggestions when city changes
+    citySelect.addEventListener('change', function() {
+        sourceSuggestions.classList.add('hidden');
+        destinationSuggestions.classList.add('hidden');
+        sourceInput.value = '';
+        destinationInput.value = '';
+    });
+});
+</script>
+{% endblock %}

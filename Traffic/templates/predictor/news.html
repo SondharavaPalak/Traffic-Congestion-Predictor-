@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block title %}Traffic News - Traffic Congestion Predictor{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="text-center mb-8">
+        <h1 class="text-3xl md:text-4xl font-bold text-black mb-4">
+            Traffic News & Updates
+        </h1>
+        <p class="text-xl text-black">
+            Stay informed with the latest traffic news from major Indian cities
+        </p>
+    </div>
+
+    <!-- City Filter -->
+    <div class="bg-lavender p-6 mb-8">
+        <div class="flex flex-col md:flex-row items-center justify-between">
+            <h2 class="text-xl font-bold text-black mb-4 md:mb-0">Filter by City</h2>
+            <div class="flex flex-wrap gap-2">
+                {% for city in cities %}
+                <a href="?city={{ city }}" class="px-4 py-2 text-sm font-medium transition duration-300
+                              {% if selected_city == city %}
+                                  bg-black text-white
+                              {% else %}
+                                  bg-white text-black hover:bg-gray-200
+                              {% endif %}">
+                    {{ city }}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- News Grid -->
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for article in news_articles %}
+        <div class="bg-lavender transition duration-300 overflow-hidden">
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <span class="text-sm text-black">{{ article.source.name }}</span>
+                    <span class="text-xs text-black">
+                        {{ article.publishedAt|slice:":10" }}
+                    </span>
+                </div>
+
+                <h3 class="text-lg font-bold text-black mb-3 line-clamp-3">
+                    {{ article.title }}
+                </h3>
+
+                <div class="flex items-center justify-between">
+                    <a href="{{ article.url }}" target="_blank"
+                        class="inline-flex items-center text-black hover:text-gray-700 font-medium">
+                        Read More
+                    </a>
+
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xs text-black">Traffic News</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-span-full text-center py-12">
+            <p class="text-lg text-black">No news articles found for {{ selected_city }}</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- News Summary -->
+    <div class="mt-12 bg-lavender p-8">
+        <div class="text-center">
+            <h3 class="text-2xl font-bold text-black mb-4">
+                Traffic News Summary for {{ selected_city }}
+            </h3>
+            <p class="text-black mb-6">
+                Stay updated with real-time traffic information and plan your journeys better
+            </p>
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="text-center">
+                    <div class="w-12 h-12 bg-black flex items-center justify-center mx-auto mb-3">
+                    </div>
+                    <h4 class="font-bold text-black mb-2">Real-time Updates</h4>
+                    <p class="text-sm text-black">Get the latest traffic conditions as they happen</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-12 h-12 bg-black flex items-center justify-center mx-auto mb-3">
+                    </div>
+                    <h4 class="font-bold text-black mb-2">Verified Sources</h4>
+                    <p class="text-sm text-black">News from trusted and reliable sources</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-12 h-12 bg-black flex items-center justify-center mx-auto mb-3">
+                    </div>
+                    <h4 class="font-bold text-black mb-2">Smart Alerts</h4>
+                    <p class="text-sm text-black">Get notified about important traffic updates</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .line-clamp-3 {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+</style>
+{% endblock %}

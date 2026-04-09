@@ -1,0 +1,67 @@
+{
+  "accuracy": 0.946,
+  "precision": 0.9439106334030296,
+  "recall": 0.946,
+  "f1_score": 0.944052003981207,
+  "confusion_matrix": [
+    [
+      18,
+      0,
+      12
+    ],
+    [
+      0,
+      740,
+      6
+    ],
+    [
+      5,
+      31,
+      188
+    ]
+  ],
+  "classification_report": "{'High': {'precision': 0.782608695652174, 'recall': 0.6, 'f1-score': 0.6792452830188679, 'support': 30.0}, 'Low': {'precision': 0.959792477302205, 'recall': 0.9919571045576407, 'f1-score': 0.975609756097561, 'support': 746.0}, 'Medium': {'precision': 0.912621359223301, 'recall': 0.8392857142857143, 'f1-score': 0.8744186046511628, 'support': 224.0}, 'accuracy': 0.946, 'macro avg': {'precision': 0.8850075107258933, 'recall': 0.810414272947785, 'f1-score': 0.8430912145891972, 'support': 1000.0}, 'weighted avg': {'precision': 0.9439106334030296, 'recall': 0.946, 'f1-score': 0.944052003981207, 'support': 1000.0}}",
+  "cross_val_scores": [
+    0.95,
+    0.96125,
+    0.94125,
+    0.95375,
+    0.95875
+  ],
+  "cross_val_mean": 0.953,
+  "cross_val_std": 0.007053367989832946,
+  "feature_importance": [
+    {
+      "feature": "hour",
+      "importance": 0.3504058543872506
+    },
+    {
+      "feature": "event",
+      "importance": 0.16377216814611598
+    },
+    {
+      "feature": "distance_km",
+      "importance": 0.15438671609438623
+    },
+    {
+      "feature": "day_type",
+      "importance": 0.12341825099261401
+    },
+    {
+      "feature": "weather",
+      "importance": 0.08718108906210627
+    },
+    {
+      "feature": "weekday",
+      "importance": 0.05221614835187316
+    },
+    {
+      "feature": "city",
+      "importance": 0.0422518061282919
+    },
+    {
+      "feature": "route_type",
+      "importance": 0.026367966837361957
+    }
+  ]
+}

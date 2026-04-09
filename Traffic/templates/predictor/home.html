@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - Traffic Congestion Predictor{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="gradient-bg text-white h-screen flex items-center justify-center overflow-hidden">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center">
+            <h1 class="text-5xl md:text-7xl font-bold mb-6" style="background: linear-gradient(45deg, #FFC0CB, #E6E6FA); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                Traffic Congestion Predictor
+            </h1>
+            <p class="text-xl md:text-2xl mb-8 max-w-3xl mx-auto">
+                Predict traffic conditions in real-time using advanced machine learning.
+                Get accurate congestion forecasts and optimal route suggestions for major Indian cities.
+            </p>
+            <a href="{% url 'predict' %}"
+                class="inline-flex items-center px-8 py-4 bg-white text-black font-bold text-lg hover:bg-gray-100 transition duration-300">
+                Predict Now
+            </a>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

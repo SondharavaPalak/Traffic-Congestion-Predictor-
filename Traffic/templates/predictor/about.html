@@ -1,0 +1,256 @@
+{% extends 'base.html' %}
+
+{% block title %}About - Traffic Congestion Predictor{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="text-center mb-12">
+        <h1 class="text-3xl md:text-4xl font-bold text-black mb-4">
+            About Traffic Congestion Predictor
+        </h1>
+        <p class="text-xl text-black max-w-3xl mx-auto">
+            A cutting-edge machine learning application that predicts traffic congestion in real-time
+            using advanced algorithms and comprehensive data analysis.
+        </p>
+    </div>
+
+    <!-- ML Workflow Section -->
+    <div class="bg-lavender p-8 mb-12">
+        <h2 class="text-2xl font-bold text-black mb-6">Machine Learning Workflow</h2>
+
+        <div class="grid md:grid-cols-3 gap-8">
+            <!-- Step 1: Data Collection -->
+            <div class="text-center">
+                <div class="w-16 h-16 bg-black flex items-center justify-center mx-auto mb-4">
+                    <span class="text-2xl font-bold text-white">1</span>
+                </div>
+                <h3 class="text-lg font-bold text-black mb-3">Data Collection</h3>
+                <p class="text-black">
+                    Comprehensive traffic data collection from multiple sources including GPS,
+                    traffic sensors, weather APIs, and historical patterns.
+                </p>
+            </div>
+
+            <!-- Step 2: Feature Engineering -->
+            <div class="text-center">
+                <div class="w-16 h-16 bg-black flex items-center justify-center mx-auto mb-4">
+                    <span class="text-2xl font-bold text-white">2</span>
+                </div>
+                <h3 class="text-lg font-bold text-black mb-3">Feature Engineering</h3>
+                <p class="text-black">
+                    Extraction and processing of key features: distance, time, weather,
+                    day type, events, and route characteristics.
+                </p>
+            </div>
+
+            <!-- Step 3: Model Training -->
+            <div class="text-center">
+                <div class="w-16 h-16 bg-black flex items-center justify-center mx-auto mb-4">
+                    <span class="text-2xl font-bold text-white">3</span>
+                </div>
+                <h3 class="text-lg font-bold text-black mb-3">Model Training</h3>
+                <p class="text-black">
+                    Advanced ML algorithms trained on extensive datasets to predict
+                    congestion levels with high accuracy.
+                </p>
+            </div>
+        </div>
+
+        <!-- Feature Details -->
+        <div class="mt-8 p-6 bg-white">
+            <h4 class="text-lg font-bold text-black mb-4">Key Features Used:</h4>
+            <div class="grid md:grid-cols-2 gap-4 text-sm">
+                <ul class="space-y-2">
+                    <li class="flex items-center">
+                        <span class="text-black mr-2">•</span>
+                        City and location data
+                    </li>
+                    <li class="flex items-center">
+                        <span class="text-black mr-2">•</span>
+                        Distance calculation (Haversine)
+                    </li>
+                    <li class="flex items-center">
+                        <span class="text-black mr-2">•</span>
+                        Time and day analysis
+                    </li>
+                    <li class="flex items-center">
+                        <span class="text-black mr-2">•</span>
+                        Weather conditions
+                    </li>
+                </ul>
+                <ul class="space-y-2">
+                    <li class="flex items-center">
+                        <span class="text-black mr-2">•</span>
+                        Holiday and event detection
+                    </li>
+                    <li class="flex items-center">
+                        <span class="text-black mr-2">•</span>
+                        Route type classification
+                    </li>
+                    <li class="flex items-center">
+                        <span class="text-black mr-2">•</span>
+                        Historical traffic patterns
+                    </li>
+                    <li class="flex items-center">
+                        <span class="text-black mr-2">•</span>
+                        Real-time data integration
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Technology Stack -->
+    <div class="bg-lavender p-8 mb-12">
+        <h2 class="text-2xl font-bold text-black mb-6">Technology Stack</h2>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Backend -->
+            <div class="bg-white p-6">
+                <h3 class="text-lg font-bold text-black mb-4">Backend</h3>
+                <ul class="space-y-2 text-sm">
+                    <li class="flex items-center">
+                        <span class="text-black mr-2">•</span>
+                        Django 5.0.2 (Python Web Framework)
+                    </li>
+                    <li class="flex items-center">
+                        <span class="text-black mr-2">•</span>
+                        scikit-learn (Machine Learning)
+                    </li>
+                    <li class="flex items-center">
+                        <span class="text-black mr-2">•</span>
+                        SQLite Database
+                    </li>
+                    <li class="flex items-center">
+                        <span class="text-black mr-2">•</span>
+                        Geopy (Geocoding)
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Frontend -->
+            <div class="bg-white p-6">
+                <h3 class="text-lg font-bold text-black mb-4">Frontend</h3>
+                <ul class="space-y-2 text-sm">
+                    <li class="flex items-center">
+                        <span class="text-black mr-2">•</span>
+                        Tailwind CSS (Styling)
+                    </li>
+                    <li class="flex items-center">
+                        <span class="text-black mr-2">•</span>
+                        HTMX (Interactive Updates)
+                    </li>
+                    <li class="flex items-center">
+                        <span class="text-black mr-2">•</span>
+                        Chart.js (Data Visualization)
+                    </li>
+                    <li class="flex items-center">
+                        <span class="text-black mr-2">•</span>
+                        Responsive Design
+                    </li>
+                </ul>
+            </div>
+
+            <!-- APIs & Services -->
+            <div class="bg-white p-6">
+                <h3 class="text-lg font-bold text-black mb-4">APIs & Services</h3>
+                <ul class="space-y-2 text-sm">
+                    <li class="flex items-center">
+                        <span class="text-black mr-2">•</span>
+                        Nominatim (Geocoding)
+                    </li>
+                    <li class="flex items-center">
+                        <span class="text-black mr-2">•</span>
+                        OpenWeather API
+                    </li>
+                    <li class="flex items-center">
+                        <span class="text-black mr-2">•</span>
+                        NewsAPI (Traffic News)
+                    </li>
+                    <li class="flex items-center">
+                        <span class="text-black mr-2">•</span>
+                        Folium (Interactive Maps)
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features -->
+    <div class="bg-lavender p-8 mb-12">
+        <h2 class="text-2xl font-bold text-black mb-6">Key Features</h2>
+
+        <div class="grid md:grid-cols-2 gap-8">
+            <div class="space-y-4">
+                <div class="flex items-start">
+                    <div class="w-8 h-8 bg-black flex items-center justify-center mr-3 mt-1">
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-black">Real-time Predictions</h4>
+                        <p class="text-sm text-black">Get instant traffic congestion predictions based on current
+                            conditions</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start">
+                    <div class="w-8 h-8 bg-black flex items-center justify-center mr-3 mt-1">
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-black">Interactive Maps</h4>
+                        <p class="text-sm text-black">Visualize routes with detailed maps and congestion overlays</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start">
+                    <div class="w-8 h-8 bg-black flex items-center justify-center mr-3 mt-1">
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-black">Transport Mode Suggestions</h4>
+                        <p class="text-sm text-black">Get personalized recommendations for the best transport mode
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <div class="flex items-start">
+                    <div class="w-8 h-8 bg-black flex items-center justify-center mr-3 mt-1">
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-black">Data Visualization</h4>
+                        <p class="text-sm text-black">Comprehensive charts and graphs for traffic analysis</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start">
+                    <div class="w-8 h-8 bg-black flex items-center justify-center mr-3 mt-1">
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-black">Traffic News Integration</h4>
+                        <p class="text-sm text-black">Stay updated with latest traffic news and alerts</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start">
+                    <div class="w-8 h-8 bg-black flex items-center justify-center mr-3 mt-1">
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-black">User Dashboard</h4>
+                        <p class="text-sm text-black">Track your prediction history and save favorite routes</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CTA Section -->
+    <div class="bg-black p-8 text-center text-white">
+        <h2 class="text-2xl font-bold mb-4">Ready to Start Predicting?</h2>
+        <p class="text-white mb-6">Experience the power of machine learning in traffic prediction</p>
+        <a href="{% url 'predict' %}"
+            class="inline-flex items-center px-6 py-3 bg-white text-black font-bold hover:bg-gray-100 transition duration-300">
+            Try Prediction Now
+        </a>
+    </div>
+</div>
+{% endblock %}

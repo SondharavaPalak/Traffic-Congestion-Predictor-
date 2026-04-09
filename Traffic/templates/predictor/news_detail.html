@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ article.title }} - Traffic News{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Back Button -->
+    <div class="mb-6">
+        <a href="{% url 'news' %}" class="inline-flex items-center text-black hover:text-gray-700 font-medium">
+            Back to News
+        </a>
+    </div>
+
+    <!-- Article Content -->
+    <article class="bg-lavender p-8">
+        <!-- Article Header -->
+        <header class="mb-8">
+            <div class="flex items-center justify-between mb-4">
+                <span class="text-sm text-black font-medium">{{ article.source.name }}</span>
+                <span class="text-sm text-black">
+                    {{ article.publishedAt|slice:":10" }}
+                </span>
+            </div>
+            
+            <h1 class="text-3xl md:text-4xl font-bold text-black mb-4">
+                {{ article.title }}
+            </h1>
+            
+            <div class="flex items-center space-x-4 text-sm text-black">
+                <div class="flex items-center">
+                    Published {{ article.publishedAt|slice:":10" }}
+                </div>
+                <div class="flex items-center">
+                    Traffic News
+                </div>
+            </div>
+        </header>
+
+        <!-- Article Body -->
+        <div class="prose prose-lg max-w-none">
+            <p class="text-lg text-black leading-relaxed">
+                {{ article.content }}
+            </p>
+        </div>
+
+        <!-- Article Footer -->
+        <footer class="mt-8 pt-6 border-t border-black">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <span class="text-sm text-black">Source:</span>
+                    <span class="text-sm font-medium text-black">{{ article.source.name }}</span>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <button onclick="window.print()" class="text-black hover:text-gray-700">
+                        Print
+                    </button>
+                </div>
+            </div>
+        </footer>
+    </article>
+
+    <!-- Related Articles Section -->
+    <div class="mt-12">
+        <h2 class="text-2xl font-bold text-black mb-6">Related News</h2>
+        <div class="grid md:grid-cols-2 gap-6">
+            <div class="bg-lavender p-6 transition duration-300">
+                <h3 class="text-lg font-bold text-black mb-2">Traffic Updates</h3>
+                <p class="text-black text-sm mb-4">Stay updated with the latest traffic conditions and road closures in your city.</p>
+                <a href="{% url 'news' %}" class="text-black hover:text-gray-700 font-medium text-sm">
+                    View All News →
+                </a>
+            </div>
+            
+            <div class="bg-lavender p-6 transition duration-300">
+                <h3 class="text-lg font-bold text-black mb-2">Traffic Predictions</h3>
+                <p class="text-black text-sm mb-4">Get accurate traffic predictions for your daily commute using our AI-powered system.</p>
+                <a href="{% url 'predict' %}" class="text-black hover:text-gray-700 font-medium text-sm">
+                    Make Prediction →
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

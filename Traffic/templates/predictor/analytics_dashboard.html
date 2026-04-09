@@ -1,0 +1,266 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Analytics Dashboard - Traffic Predictor{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="h3 text-primary">📊 Analytics Dashboard</h1>
+            <p class="text-muted">City-wide traffic trends, predictions, and insights</p>
+        </div>
+        <div class="col-md-4">
+            <select class="form-select" id="citySelect" onchange="window.location.href='?city=' + this.value">
+                {% for city in cities %}
+                    <option value="{{ city }}" {% if city == selected_city %}selected{% endif %}>{{ city }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <!-- Key Metrics Row -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card border-primary">
+                <div class="card-body">
+                    <small class="text-muted">Total Predictions (30 days)</small>
+                    <h4 class="mt-2">{{ accuracy_data.total_predictions }}</h4>
+                    <small class="text-success">Tracking accuracy</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-success">
+                <div class="card-body">
+                    <small class="text-muted">Prediction Accuracy</small>
+                    <h4 class="mt-2 text-success">{{ accuracy_data.overall_accuracy }}%</h4>
+                    {% if accuracy_data.overall_accuracy >= 80 %}
+                        <small class="text-success">✓ Excellent</small>
+                    {% elif accuracy_data.overall_accuracy >= 70 %}
+                        <small class="text-info">▶ Good</small>
+                    {% else %}
+                        <small class="text-warning">⚠ Needs improvement</small>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-warning">
+                <div class="card-body">
+                    <small class="text-muted">Your Trips ({{ selected_city }})</small>
+                    <h4 class="mt-2">{{ user_trips }}</h4>
+                    <small class="text-muted">Avg cost: ₹{{ avg_cost }}</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-info">
+                <div class="card-body">
+                    <small class="text-muted">Data Status</small>
+                    <h4 class="mt-2 text-info">Live</h4>
+                    <small class="text-success">Updated continuously</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Accuracy Breakdown -->
+    {% if accuracy_data.by_congestion_level %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0">Prediction Accuracy by Congestion Level</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for level, stats in accuracy_data.by_congestion_level.items %}
+                        <div class="col-md-4 mb-3">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span><strong>{{ level }}</strong></span>
+                                <span class="badge bg-primary">{{ stats.accuracy }}%</span>
+                            </div>
+                            <div class="progress" style="height: 30px;">
+                                <div class="progress-bar" style="width: {{ stats.accuracy }}%;">{{ stats.correct }}/{{ stats.predictions }}</div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Busiest Hours & Peak Patterns -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0">🔴 Busiest Hours in {{ selected_city }}</h6>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Day & Time</th>
+                                <th>Risk</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for hour in busiest_hours %}
+                            <tr>
+                                <td>#{{ hour.rank }}</td>
+                                <td>{{ hour.day }} {{ hour.hour }}</td>
+                                <td>
+                                    <span class="badge bg-danger">{{ hour.probability_high }}% High</span>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="3" class="text-center text-muted">No data available</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Peak Hours Chart Area -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0">Peak Hour Patterns</h6>
+                </div>
+                <div class="card-body">
+                    {% if peak_hours %}
+                    <div id="peakHoursChart" style="height: 250px;"></div>
+                    {% else %}
+                    <p class="text-muted text-center">No peak hour data available</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cost Analysis -->
+    {% if cost_analysis.total_trips > 0 %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0">💰 Your Cost Analysis ({{ selected_city }})</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <h6>Total Spend</h6>
+                            <h3 class="text-danger">₹{{ cost_analysis.total_cost }}</h3>
+                            <small class="text-muted">{{ cost_analysis.total_trips }} trips</small>
+                        </div>
+                        <div class="col-md-4">
+                            <h6>Avg Cost/Trip</h6>
+                            <h3 class="text-info">₹{{ cost_analysis.avg_cost_per_trip }}</h3>
+                            <small class="text-muted">By transportation</small>
+                        </div>
+                        <div class="col-md-4">
+                            <h6>Cost Breakdown</h6>
+                            <ul class="list-unstyled small">
+                                <li>🚗 Fuel: ₹{{ cost_analysis.cost_breakdown.fuel }}</li>
+                                <li>🛣️ Toll: ₹{{ cost_analysis.cost_breakdown.toll }}</li>
+                                <li>🅿️ Parking: ₹{{ cost_analysis.cost_breakdown.parking }}</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Historical Trends -->
+    {% if trends_summary.avg_congestion_score %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0">📈 30-Day Trends</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <strong>Avg Congestion</strong>
+                            <h5 class="mt-2">{{ trends_summary.avg_congestion_score }}/10</h5>
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Prediction Accuracy</strong>
+                            <h5 class="mt-2">{{ trends_summary.avg_prediction_accuracy }}%</h5>
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Total Predictions</strong>
+                            <h5 class="mt-2">{{ trends_summary.total_predictions }}</h5>
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Trend Direction</strong>
+                            <h5 class="mt-2 text-success">📉 Improving</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Action Buttons -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <a href="{% url 'trip_history' %}" class="btn btn-primary">
+                📋 View Trip History
+            </a>
+            <a href="{% url 'user_profile' %}" class="btn btn-secondary">
+                ⚙️ Manage Profile
+            </a>
+            <a href="{% url 'route_optimization' %}" class="btn btn-info">
+                🛣️ Route Optimization
+            </a>
+        </div>
+    </div>
+
+    {% if error %}
+    <div class="alert alert-warning">
+        ⚠️ Some data could not be loaded. Please try again later.
+    </div>
+    {% endif %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+<script>
+    // Peak hours chart
+    {% if peak_hours %}
+    const peakHoursCtx = document.getElementById('peakHoursChart')?.getContext('2d');
+    if (peakHoursCtx) {
+        new Chart(peakHoursCtx, {
+            type: 'bar',
+            data: {
+                labels: [{% for hour in peak_hours %}'{{ hour.hour }}:00'{{ not forloop.last|yesno:"," }}{% endfor %}],
+                datasets: [{
+                    label: 'Congestion Score',
+                    data: [{% for hour in peak_hours %}{{ hour.congestion_score }}{{ not forloop.last|yesno:"," }}{% endfor %}],
+                    backgroundColor: '#FF6B6B',
+                    borderColor: '#FF6B6B',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true, max: 1 } }
+            }
+        });
+    }
+    {% endif %}
+</script>
+{% endblock %}

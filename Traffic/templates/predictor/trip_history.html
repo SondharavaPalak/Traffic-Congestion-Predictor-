@@ -1,0 +1,215 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Trip History - Traffic Predictor{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="h3 text-primary">📋 My Trip History</h1>
+            <p class="text-muted">Track your journeys and analyze your travel patterns</p>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card border-primary">
+                <div class="card-body">
+                    <small class="text-muted">Total Trips</small>
+                    <h4 class="mt-2">{{ total_trips }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-info">
+                <div class="card-body">
+                    <small class="text-muted">Total Distance</small>
+                    <h4 class="mt-2">{{ total_distance }} km</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-warning">
+                <div class="card-body">
+                    <small class="text-muted">Total Spent</small>
+                    <h4 class="mt-2">₹{{ total_cost }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-success">
+                <div class="card-body">
+                    <small class="text-muted">Avg Cost/Trip</small>
+                    <h4 class="mt-2">₹{{ avg_cost|default:"0" }}</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form method="GET" class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Filter by City</label>
+                            <select class="form-select" name="city" onchange="this.form.submit()">
+                                <option value="">All Cities</option>
+                                {% for city in cities %}
+                                <option value="{{ city }}" {% if current_filters.city == city %}selected{% endif %}>{{ city }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Filter by Mode</label>
+                            <select class="form-select" name="mode" onchange="this.form.submit()">
+                                <option value="">All Modes</option>
+                                {% for mode in modes %}
+                                <option value="{{ mode }}" {% if current_filters.mode == mode %}selected{% endif %}>{{ mode }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Sort By</label>
+                            <select class="form-select" name="sort" onchange="this.form.submit()">
+                                <option value="-travel_date">Newest First</option>
+                                <option value="travel_date">Oldest First</option>
+                                <option value="-total_cost">Most Expensive</option>
+                                <option value="total_cost">Cheapest</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Trip Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0">Recent Trips (Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }})</h6>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Date & Time</th>
+                                <th>City</th>
+                                <th>Route</th>
+                                <th>Distance</th>
+                                <th>Mode</th>
+                                <th>Prediction vs Actual</th>
+                                <th>Duration</th>
+                                <th>Cost</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for trip in page_obj %}
+                            <tr>
+                                <td>{{ trip.travel_date|date:"d M Y, H:i" }}</td>
+                                <td>
+                                    <span class="badge bg-primary">{{ trip.city }}</span>
+                                </td>
+                                <td>
+                                    <small>{{ trip.source }} → {{ trip.destination }}</small>
+                                </td>
+                                <td>{{ trip.distance_km }} km</td>
+                                <td>{{ trip.mode_used }}</td>
+                                <td>
+                                    <small>
+                                        {% if trip.predicted_congestion == trip.actual_congestion %}
+                                            <span class="badge bg-success">✓ Correct</span>
+                                        {% else %}
+                                            <span class="badge bg-warning">Pred: {{ trip.predicted_congestion }}<br>Actual: {{ trip.actual_congestion }}</span>
+                                        {% endif %}
+                                    </small>
+                                </td>
+                                <td>
+                                    {% if trip.actual_duration_mins %}
+                                        <small>{{ trip.actual_duration_mins }} mins</small>
+                                    {% else %}
+                                        <small class="text-muted">-</small>
+                                    {% endif %}
+                                </td>
+                                <td class="fw-bold">₹{{ trip.total_cost }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="8" class="text-center text-muted py-4">
+                                    No trips found. Start making predictions to build your history!
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                {% if page_obj.has_other_pages %}
+                <div class="card-footer">
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center mb-0">
+                            {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=1">First</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                                </li>
+                            {% endif %}
+
+                            <li class="page-item active">
+                                <span class="page-link">{{ page_obj.number }}</span>
+                            </li>
+
+                            {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Export & Download -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <button class="btn btn-success" onclick="exportToCSV()">📥 Export to CSV</button>
+            <button class="btn btn-secondary" onclick="window.print()">🖨️ Print Report</button>
+            <a href="{% url 'saved_destinations' %}" class="btn btn-info">⭐ Saved Destinations</a>
+        </div>
+    </div>
+</div>
+
+<script>
+function exportToCSV() {
+    // Simple CSV export functionality
+    let csv = 'Date,City,From,To,Distance,Mode,Prediction,Actual,Duration,Cost\n';
+    
+    document.querySelectorAll('tbody tr').forEach(row => {
+        const cells = row.querySelectorAll('td');
+        if (cells.length > 0) {
+            csv += Array.from(cells).map(cell => '"' + cell.textContent.trim() + '"').join(',') + '\n';
+        }
+    });
+    
+    const link = document.createElement('a');
+    link.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+    link.download = 'trip_history_' + new Date().toISOString().split('T')[0] + '.csv';
+    link.click();
+}
+</script>
+{% endblock %}
