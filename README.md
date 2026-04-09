@@ -1,10 +1,10 @@
-# 🚗 Traffic Predictor - Real-Time Traffic Congestion Prediction System
+# Traffic Predictor - Real-Time Traffic Congestion Prediction System
 
 A **production-quality web application** that predicts traffic congestion in real-time using advanced machine learning algorithms. Designed for major Indian cities with interactive maps, data visualization, and personalized transport recommendations.
 
 ---
 
-## 📋 Table of Contents
+## Table of Contents
 
 1. [Project Overview](#project-overview)
 2. [Features](#features)
@@ -23,7 +23,7 @@ A **production-quality web application** that predicts traffic congestion in rea
 
 ---
 
-## 🎯 Project Overview
+## Project Overview
 
 **Traffic Predictor** is a Django-based web application that leverages machine learning to predict traffic congestion levels across Indian cities. The system analyzes multiple factors including time of day, weather conditions, special events, and route characteristics to provide accurate, real-time congestion forecasts.
 
@@ -37,18 +37,18 @@ A **production-quality web application** that predicts traffic congestion in rea
 - ✅ Provide beautiful, responsive user interface
 
 ### Supported Cities
-- 🏙️ Delhi
-- 🏙️ Mumbai
-- 🏙️ Bengaluru
-- 🏙️ Hyderabad
-- 🏙️ Chennai
-- 🏙️ Kolkata
+- Delhi
+- Mumbai
+- Bengaluru
+- Hyderabad
+- Chennai
+- Kolkata
 
 ---
 
-## ✨ Features
+## Features
 
-### 🔮 Core Prediction Features
+### Core Prediction Features
 - **Real-Time Traffic Prediction**: Get instant congestion forecasts for any route
 - **Confidence Scores**: View probability distributions for each congestion level
 - **Interactive Route Mapping**: Visualize routes with Folium interactive maps
@@ -56,20 +56,20 @@ A **production-quality web application** that predicts traffic congestion in rea
 - **Weather Integration**: Real-time weather data via OpenWeather API (optional)
 - **Holiday Detection**: Automatic Indian holiday detection and factoring
 
-### 🚁 Route & Transport Features
+### Route & Transport Features
 - **Intelligent Mode Suggestions**: Automated transport mode recommendations (Car, Metro, Bike/Walk)
 - **Cost Estimation**: Calculate fuel/toll costs based on distance and vehicle
 - **Route Type Detection**: Automatic classification (Local, Suburban, Highway)
 - **Duration Estimation**: Predict travel time based on congestion level
 
-### 📊 Analytics & Visualization
+### Analytics & Visualization
 - **Interactive Dashboard**: View global traffic statistics and trends
 - **Chart.js Integration**: Beautiful charts for data visualization
 - **Trip History Tracking**: Complete history of all predictions and actual outcomes
 - **Accuracy Metrics**: Real-time model performance tracking
 - **Prediction Analytics**: Detailed breakdown by city, time, and congestion level
 
-### 📱 User Experience
+### User Experience
 - **Responsive Design**: Mobile-first Tailwind CSS design
 - **HTMX Integration**: Dynamic UI updates without page refreshes
 - **User Profiles**: Personalized preferences and favorite destinations
@@ -78,14 +78,14 @@ A **production-quality web application** that predicts traffic congestion in rea
 
 ---
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 ### Backend Framework & Dependencies
 
 | Technology | Version | Purpose |
 |-----------|---------|---------|
-| **Django** | 5.0.2 | Web framework for Python |
-| **Python** | 3.10+ | Programming language |
+| **Django** | 4.9 | Web framework for Python |
+| **Python** | 3.9+ | Programming language |
 | **SQLite** | Latest | Relational database |
 | **scikit-learn** | 1.7.1 | Machine learning library |
 | **NumPy** | 2.3.2 | Numerical computing |
@@ -138,7 +138,7 @@ A **production-quality web application** that predicts traffic congestion in rea
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 traffic-predictor/
@@ -421,7 +421,7 @@ Response to User
 
 ---
 
-## 🤖 Machine Learning Model
+## Machine Learning Model
 
 ### Model Overview
 
@@ -729,7 +729,7 @@ Weather varies by season:
 
 ---
 
-## 🔄 Workflow
+## Workflow
 
 ### User Journey: Making a Prediction
 
@@ -858,11 +858,11 @@ Weather varies by season:
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
-### 📋 Prerequisites
+### Prerequisites
 
-- **Python**: 3.10 or higher
+- **Python**: 3.9 or higher
 - **pip**: Python package manager
 - **Git**: For cloning repository
 - **Virtual Environment**: Recommended (venv/virtualenv)
@@ -873,7 +873,7 @@ Weather varies by season:
 ### Step 1: Clone Repository
 
 ```bash
-git clone https://github.com/yourusername/traffic-predictor.git
+git clone https://github.com/SondharavaPalak/Traffic-Congestion-Predictor.git
 cd traffic-predictor
 ```
 
@@ -899,7 +899,7 @@ pip install --upgrade pip
 pip install -r Traffic/requirements.txt
 
 # Or install individually:
-pip install Django==5.0.2
+pip install Django==4.9
 pip install scikit-learn==1.7.1
 pip install folium==0.20.0
 pip install holidays==0.79
@@ -977,7 +977,7 @@ Open your browser:
 
 ---
 
-## ⚙️ Configuration & Customization
+## Configuration & Customization
 
 ### Environment Variables
 
@@ -1108,7 +1108,7 @@ python model_train.py
 
 ---
 
-## 📱 Usage Guide
+## Usage Guide
 
 ### Making Your First Prediction
 
@@ -1172,7 +1172,7 @@ python model_train.py
 
 ---
 
-## 🗄️ Database Models
+## Database Models
 
 ### Prediction Model
 
@@ -1249,7 +1249,7 @@ class TripHistory(models.Model):
 
 ---
 
-## 🔌 API Endpoints
+## API Endpoints
 
 ### Main Views
 
@@ -1307,7 +1307,7 @@ Response:
 
 ---
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Common Issues & Solutions
 
@@ -1412,7 +1412,7 @@ python checkaccuracy.py
 
 ---
 
-## 📈 Performance Notes
+## Performance Notes
 
 ### Model Performance
 - **Accuracy**: 94.6% on test set
@@ -1436,13 +1436,13 @@ python checkaccuracy.py
 
 ---
 
-## 📝 License
+## License
 
 This project is licensed under the MIT License. See LICENSE file for details.
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Follow these steps:
 
@@ -1454,16 +1454,15 @@ Contributions are welcome! Follow these steps:
 
 ---
 
-## 📞 Support & Contact
+## Support & Contact
 
 For issues, questions, or suggestions:
 - Open an issue on GitHub
-- Contact: support@trafficpredictor.com
-- Documentation: [Full Docs](https://docs.trafficpredictor.com)
+- Contact: palaksondhrava@gmail.com
 
 ---
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - **scikit-learn** team for ML library
 - **Django** community for web framework
@@ -1473,7 +1472,7 @@ For issues, questions, or suggestions:
 
 ---
 
-## 📚 Additional Resources
+## Additional Resources
 
 ### Tutorials & Guides
 - [Django Documentation](https://docs.djangoproject.com/)
@@ -1489,5 +1488,3 @@ For issues, questions, or suggestions:
 ---
 
 **Last Updated**: April 2026  
-**Version**: 2.0 (Professional)  
-**Status**: Production Ready ✅
